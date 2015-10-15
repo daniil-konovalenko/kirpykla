@@ -1,4 +1,4 @@
-import sqlite3
+    import sqlite3
 
 file_name = input('¬ведите название файла')
 file = open(file_name, "r")
@@ -15,7 +15,7 @@ mark_number = table[0].find('Ѕаллы')
 olymp_name = input("¬ведите название олимпиады")
 con = sqlite3.connect('data.db')
 cur = con.cursor()
-cur.execute('CREATE TABLE')
+cur.execute('CREATE TABLE ...')
 for i in table[1:]:
-    cur.execute('INSERT INTO ')
+    cur.execute('INSERT INTO ...')
 
