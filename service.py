@@ -12,10 +12,10 @@ def get_results(student_data, cursor):
 
 
     student_id_response = cursor.execute("SELECT id FROM students WHERE "
-                                "first_name=:first_name AND "
-                                "second_name=:second_name AND "
-                                "last_name=:last_name AND "
-                                "school_id=:school_id", student_data).fetchone()
+                                         "first_name=:first_name AND "
+                                         "second_name=:second_name AND "
+                                         "last_name=:last_name AND "
+                                         "school_id=:school_id", student_data).fetchone()
     if not student_id_response:
         return [['', 'Вы', 'неудачник']]
     student_id = student_id_response[0]
@@ -37,7 +37,7 @@ def get_results(student_data, cursor):
 
 def add_table(cursor, table_name):
     # Adds an olympiad results table to the specified database
-    cursor.execute("CREATE TABLE '{}' ("
+    cursor.execute("CREATE TABLE IF NOT EXISTS '{}' ("
                    "'id' INTEGER PRIMARY KEY AUTOINCREMENT, "
                    "'student_id' INTEGER,"
                    "'year' INTEGER,"
