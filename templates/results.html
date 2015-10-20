@@ -5,6 +5,24 @@
     <title></title>
 </head>
 <body>
-
+{% if results_table %}
+<table border="1">
+    <tr>
+        <td>Олимпиада</td>
+        <td>Результат</td>
+        <td>Титул</td>
+        <td>Год участия</td>
+    </tr>
+    {% for row in results_table %}
+        <tr>
+            {% for data in row %}
+                <td>{{data}}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+{% else %}
+Таблица результатов не задана
+{% endif %}
 </body>
 </html>
