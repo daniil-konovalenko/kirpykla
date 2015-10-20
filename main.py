@@ -1,4 +1,6 @@
 from flask import Flask, request, render_template
+from service import get_results
+import sqlite3
 
 app = Flask(__name__)
 
@@ -8,7 +10,23 @@ def index():
 
 @app.route('/results', methods=['GET', 'POST'])
 def results():
-    return render_template('results.html')
+    if request.method == 'POST':
+        connection = sqlite3.connect('results.sqlite3')
+        cursor = connection.cursor()
+        student_data = dict(
+            first_name = request.form['first_name'],
+            second_name = request.form['second_name'],
+            last_name = request.form['last_name'],
+            school_id = request.form['school_id']
+        )
+
+        results_table = get_results(student_data, cursor)
+        connection.close()
+        return render_template('results.html', results_table)
+
+    else:
+        return render_template('results.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

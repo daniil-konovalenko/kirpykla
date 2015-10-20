@@ -103,3 +103,5 @@ $RECYCLE.BIN/
 # PyCharm
 
 .idea/
+results.sqlite3
+config.ini
