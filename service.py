@@ -11,11 +11,14 @@ def get_results(student_data, cursor):
     logging.debug(tables)
 
 
-    student_id = cursor.execute("SELECT id FROM students WHERE "
+    student_id_response = cursor.execute("SELECT id FROM students WHERE "
                                 "first_name=:first_name AND "
                                 "second_name=:second_name AND "
                                 "last_name=:last_name AND "
-                                "school_id=:school_id", student_data).fetchone()[0]
+                                "school_id=:school_id", student_data).fetchone()
+    if not student_id_response:
+        return [['', 'Вы', 'неудачник']]
+    student_id = student_id_response[0]
     results_table = []
     for table in tables:
         olymp = table[0]

@@ -22,11 +22,12 @@ def results():
             first_name = request.form['first_name'],
             second_name = request.form['second_name'],
             last_name = request.form['last_name'],
-            school_id = request.form['login_statgrad']
+            school_id = request.form['login_statgrad'].strip('sch')
         )
         logging.debug(student_data)
         results_table = get_results(student_data, cursor)
         connection.close()
+        logging.debug(results_table)
         return render_template('results.html', results_table=results_table)
 
     else:
