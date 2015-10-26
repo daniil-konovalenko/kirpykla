@@ -1,8 +1,7 @@
 import sqlite3
-import configparser
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 def get_results(student_data, cursor):
     response = cursor.execute("SELECT name from sqlite_master WHERE type = 'table';")
@@ -17,7 +16,7 @@ def get_results(student_data, cursor):
                                          "last_name=:last_name AND "
                                          "school_id=:school_id", student_data).fetchone()
     if not student_id_response:
-        return [['', 'Вы', 'неудачник']]
+        return {'status': 'NOT FOUND'}
     student_id = student_id_response[0]
     results_table = []
     for table in tables:
@@ -33,7 +32,7 @@ def get_results(student_data, cursor):
 
             results_table.append([olymp, result, title, year])
 
-    return results_table
+    return {'status': 'OK', 'table': results_table}
 
 def add_table(cursor, table_name):
     # Adds an olympiad results table to the specified database

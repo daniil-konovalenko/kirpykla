@@ -5,10 +5,15 @@ from service import add_table, get_results
 
 class ServiceTester(unittest.TestCase):
     def setUp(self):
-        self.student = {'first_name': 'Иван',
-                        'second_name': 'Иванович',
-                        'last_name': 'Иванов',
-                        'school_id': 1}
+        self.existing_student = {'first_name': 'Иван',
+                                 'second_name': 'Иванович',
+                                 'last_name': 'Иванов',
+                                 'school_id': 1}
+        self.not_existing_student = {'first_name': 'Михаил',
+                                     'second_name': 'Алексеевич',
+                                     'last_name': 'Калинин',
+                                     'school_id': 779004}
+
         self.connection = sqlite3.connect(':memory:')
         self.cursor = self.connection.cursor()
         self.cursor.execute("CREATE TABLE 'students' ("
@@ -28,7 +33,7 @@ class ServiceTester(unittest.TestCase):
 
         self.cursor.execute("INSERT into 'students' VALUES "
                             "(NULL, :first_name, :second_name, :last_name, :school_id)",
-                            self.student)
+                            self.existing_student)
 
         self.cursor.execute("INSERT into 'test' VALUES (NULL, 1, 2007, '100', 'Победитель')")
         
@@ -50,9 +55,15 @@ class ServiceTester(unittest.TestCase):
         self.assertEqual(real_sql, right_sql)
 
     def test_get_results(self):
-        real_results = get_results(self.student, self.cursor)
-        right_results = [['test', '100', 'Победитель', 2007]]
+        real_results = get_results(self.existing_student, self.cursor)
+        right_results = {'status': 'OK' , 'table': [['test', '100', 'Победитель', 2007]]}
         self.assertEqual(real_results, right_results)
+
+    def test_get_results_not_found(self):
+        real_results = get_results(self.not_existing_student, self.cursor)
+        right_results = {'status': 'NOT FOUND'}
+        self.assertEqual(real_results, right_results)
+
 
 
 if __name__ == '__main__':

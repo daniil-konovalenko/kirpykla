@@ -34,10 +34,8 @@ if __name__ == '__main__':
     logging.info('Table was created successfully')
     for pair in pairs:
         cursor.execute("INSERT into schools VALUES (NULL, :school_name, :statgrad_id)",
-                       {'school_name': pair[1], 'statgrad_id': pair[0].lstrip('sch')})
+                       {'school_name': pair[1].upper(), 'statgrad_id': pair[0].lstrip('sch')})
     connection.commit()
     connection.close()
     logging.info('School ids filled in successfully')
-
-
 

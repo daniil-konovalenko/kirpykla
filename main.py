@@ -13,8 +13,7 @@ def index():
 @app.route('/results', methods=['GET', 'POST'])
 def results():
     if request.method == 'POST':
-        logging.debug('Post sent')
-
+        logging.debug('Post received')
         connection = sqlite3.connect('results.sqlite3')
         cursor = connection.cursor()
         logging.debug(request.form)
@@ -25,10 +24,12 @@ def results():
             school_id = request.form['login_statgrad'].strip('sch')
         )
         logging.debug(student_data)
-        results_table = get_results(student_data, cursor)
+        results_response = get_results(student_data, cursor)
         connection.close()
-        logging.debug(results_table)
-        return render_template('results.html', results_table=results_table)
+        if results_response['status'] == 'OK':
+            return render_template('results.html', results_table=results_response['table'])
+        else:
+            return render_template('results.html')
 
     else:
         return render_template('results.html')
