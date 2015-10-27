@@ -1,15 +1,14 @@
-from service import add_table
 import requests
 import bs4
 import sqlite3
 import logging
-from service import fill_database, get_results
-import sys
+from service import fill_database
 
-logging.basicConfig(level=logging.DEBUG)
+
 def rosatom():
     result_table = []
-    url = "https://mephi.ru/schoolkids/olimpiads/rosatom/Pobediteli/pobediteli-fizika-14.php"
+    url = ("https://mephi.ru/schoolkids/olimpiads/rosatom/"
+           "Pobediteli/pobediteli-fizika-14.php")
     logging.info('Connecting to rosatom website')
     res = requests.get(url)
     assert res.status_code == requests.codes.ok
@@ -32,30 +31,24 @@ def rosatom():
         result = table_data[2]
         title = 'Диплом {} степени'.format(table_data[3])
         school_id = 1
-        result_table.append({'first_name': first_name, 'second_name':second_name,
-                             'last_name': last_name, 'result': result, 'title': title ,
+        result_table.append({'first_name': first_name, 'second_name': second_name,
+                             'last_name': last_name, 'result': result, 'title': title,
                              'school_id': school_id, 'year': 2014})
 
-
     logging.info('Connecting to database')
-    connection = sqlite3.connect('results.sqlite3')
+    results_connection = sqlite3.connect('results.sqlite3')
+    service_connection = sqlite3.connect('service.sqlite3')
     logging.info('Connected to database')
 
-    cursor = connection.cursor()
-    fill_database(result_table, 'Олимпиада Росатом по физике', cursor)
-    connection.commit()
-    connection.close()
+    results_cursor = results_connection.cursor()
+    service_cursor = service_connection.cursor()
+
+    fill_database(result_table, 'Олимпиада Росатом по физике', results_cursor,
+                  service_cursor)
+    results_connection.commit()
+    results_connection.close()
 
 
 if __name__ == '__main__':
-    logging.info('Connecting to database')
-    connection = sqlite3.connect('results.sqlite3')
-    logging.info('Connected to database')
-
-    cursor = connection.cursor()
-    student = {'first_name': 'Михаил', 'second_name': 'Михайлович',
-               'last_name': 'Авдеев', 'school_id': 1}
-
-
-    connection.close()
-
+    logging.basicConfig(level = logging.DEBUG)
+    rosatom()

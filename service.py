@@ -1,14 +1,11 @@
-import sqlite3
 import logging
 
-logging.basicConfig(level=logging.INFO)
 
 def get_results(student_data, cursor):
-    response = cursor.execute("SELECT name from sqlite_master WHERE type = 'table';")
+    response = cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table';")
 
     tables = set(response.fetchall()) - {('students',), ('sqlite_sequence',)}
     logging.debug(tables)
-
 
     student_id_response = cursor.execute("SELECT id FROM students WHERE "
                                          "first_name=:first_name AND "
@@ -21,10 +18,10 @@ def get_results(student_data, cursor):
     results_table = []
     for table in tables:
         olymp = table[0]
-        query = "SELECT result, title, year from '{}' WHERE student_id = ?".format(olymp)
+        query = "SELECT result, title, year FROM '{}' WHERE student_id = ?".format(olymp)
         logging.debug(student_id)
         logging.debug(query)
-        result_response = cursor.execute(query, (student_id, ))
+        result_response = cursor.execute(query, (student_id,))
         for result_row in result_response:
             result = result_row[0]
             title = result_row[1]
@@ -33,6 +30,7 @@ def get_results(student_data, cursor):
             results_table.append([olymp, result, title, year])
 
     return {'status': 'OK', 'table': results_table}
+
 
 def add_table(cursor, table_name):
     # Adds an olympiad results table to the specified database
@@ -45,23 +43,24 @@ def add_table(cursor, table_name):
                    ");".format(table_name))
 
 
-def fill_database(results_table, olymp_name, cursor):
+def fill_database(results_table, olymp_name, results_cursor, service_cursor):
     """
     results_table = {first_name: , second_name, last_name, school_id, }
     """
-    try:
-        add_table(cursor, olymp_name)
-    except sqlite3.OperationalError:
-        logging.info('Table already exists')
+    add_table(results_cursor, olymp_name)
 
     for result_row in results_table:
-        cursor.execute("INSERT into 'students' VALUES (NULL, :first_name, :second_name, "
-                       ":last_name, :school_id)", result_row)
+        service_cursor.execute("INSERT INTO 'students' VALUES (NULL, :first_name, "
+                               "                                     :second_name,"
+                               "                                     :last_name,"
+                               "                                     :school_id)",
+                               result_row)
 
-        result_row['student_id'] = cursor.lastrowid
+        result_row['student_id'] = service_cursor.lastrowid
 
-        cursor.execute("INSERT into '{}' VALUES (NULL, :student_id, :year, "
-                       "                                 :result, :title)".format(olymp_name), result_row)
+        results_cursor.execute("INSERT INTO '{}' VALUES (NULL, :student_id, :year, "
+                               ":result, :title)".format(olymp_name), result_row)
 
 
-
+if __name__ == '__main__':
+    logging.basicConfig(level = logging.INFO)
