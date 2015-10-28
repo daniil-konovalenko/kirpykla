@@ -1,19 +1,20 @@
 import logging
 
 
-def get_results(student_data, cursor):
-    response = cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table';")
+def get_results(student_data, results_cursor, service_cursor):
+    response = results_cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table';")
 
     tables = set(response.fetchall()) - {('students',), ('sqlite_sequence',)}
-    logging.debug(tables)
+    logging.debug('Found tables: {}'.format(tables))
 
-    student_id_response = cursor.execute("SELECT id FROM students WHERE "
-                                         "first_name=:first_name AND "
-                                         "second_name=:second_name AND "
-                                         "last_name=:last_name AND "
-                                         "school_id=:school_id", student_data).fetchone()
+    student_id_response = service_cursor.execute("SELECT id FROM students WHERE "
+                                                 "first_name=:first_name AND "
+                                                 "second_name=:second_name AND "
+                                                 "last_name=:last_name AND "
+                                                 "school_id=:school_id", student_data).fetchone()
     if not student_id_response:
         return {'status': 'NOT FOUND'}
+
     student_id = student_id_response[0]
     results_table = []
     for table in tables:
@@ -21,7 +22,7 @@ def get_results(student_data, cursor):
         query = "SELECT result, title, year FROM '{}' WHERE student_id = ?".format(olymp)
         logging.debug(student_id)
         logging.debug(query)
-        result_response = cursor.execute(query, (student_id,))
+        result_response = results_cursor.execute(query, (student_id,))
         for result_row in result_response:
             result = result_row[0]
             title = result_row[1]
