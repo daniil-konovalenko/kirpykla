@@ -45,6 +45,8 @@ def rosatom():
 
     fill_database(result_table, 'Олимпиада Росатом по физике', results_cursor,
                   service_cursor)
+    service_connection.commit()
+    service_connection.close()
     results_connection.commit()
     results_connection.close()
 
